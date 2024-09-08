@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: multitool-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: multitool
+  template:
+    metadata:
+      labels:
+        app: multitool
+    spec:
+      containers:
+        - name: multitool
+          image: praqma/network-multitool
+          command: ["/bin/sh"]
+          args:
+            - -c
+            - >
+              while true; do
+                echo "$(date)" >> /mnt/data/data.txt;
+                sleep 5;
+              done
+          volumeMounts:
+            - name: nfs-storage
+              mountPath: /mnt/data
+      volumes:
+        - name: nfs-storage
+          persistentVolumeClaim:
+            claimName: nfs-pvc
